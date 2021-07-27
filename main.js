@@ -1,7 +1,7 @@
 let c = document.getElementById("canvas");
 let ctx = c.getContext("2d");
-let car = new Car(10, 10, 50, 100);
-let obstacles = [];
+let car = new Car(10, 400, 50, 100);
+let obstacle = new Obstacle(50, 0, 30);
 
 function moveCar() {
     switch (event.keyCode) {
@@ -26,43 +26,45 @@ function moveCar() {
     car.drawCar(ctx);
 }
 
-function moveObstacle(obstacle) {
-    obstacle.moveDown();
-}
-
-function moveMulti() {
-    for (let obstacle of obstacles) {
-        moveObstacle(obstacle)
+function moveObstacle() {
+    if (checkCollision() === true) {
+        location.reload();
+        clearInterval(intervalId)
+        alert("Game Over");
     }
+    if (obstacle.y >= 450) {
+        obstacle.y = 0;
+    }
+    obstacle.moveDown();
     clearCanvas();
     drawCanvas();
 }
 
 function drawCanvas() {
+    obstacle.drawObstacle(ctx);
     car.drawCar(ctx);
-    drawMultiObstacle();
 }
 
-function initObstacle() {
-    for (let i = 0; i < 10; i++) {
-        let x = Math.round(Math.random() * 500);
-        let y = Math.round(Math.random() * 500);
-        let obstacle = new Obstacle(x, y, 30);
-        obstacles.push(obstacle);
+function checkCollision() {
+    if (((car.x <= obstacle.x + obstacle.radius && obstacle.x + obstacle.radius <= car.x + car.width) &&
+        car.y <= obstacle.y + obstacle.radius && obstacle.y + obstacle.radius <= car.y + car.height)) {
+        return true;
+    }else if(((car.x <= obstacle.x - obstacle.radius && obstacle.x - obstacle.radius <= car.x + car.width)) &&
+        car.y <= obstacle.y - obstacle.radius && obstacle.y - obstacle.radius <=car.y + car.height){
+        return true;
+    }else if(((car.x <= obstacle.x - obstacle.radius && obstacle.x - obstacle.radius <= car.x + car.width)) &&
+        car.y <= obstacle.y + obstacle.radius && obstacle.y + obstacle.radius <=car.y + car.height){
+        return true;
     }
-}
-
-function drawMultiObstacle() {
-    for (let i = 0; i < obstacles.length; i++) {
-        obstacles[i].drawObstacle(ctx);
-    }
+    return false;
 }
 
 function clearCanvas() {
     ctx.clearRect(0, 0, 1000, 500);
 }
 
-setInterval(moveMulti, 1000) //ms => 1000ms = 1s
-initObstacle()
-drawCanvas()
+let intervalId = setInterval(moveObstacle, 1000) //ms => 1000ms = 1s
+
+car.drawCar(ctx);
+obstacle.drawObstacle(ctx);
 window.addEventListener("keydown", moveCar);

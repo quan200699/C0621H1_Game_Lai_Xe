@@ -12,6 +12,7 @@ class Obstacle {
     drawObstacle(ctx) {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI);
+        ctx.fillStyle = "red";
         ctx.fill();
     }
 
